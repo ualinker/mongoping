@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 4.2)
-project(untitled C)
+project(mongoping C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(untitled main.c)
+add_executable(mongoping main.c)
