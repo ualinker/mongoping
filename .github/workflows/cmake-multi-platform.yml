@@ -4,9 +4,9 @@ name: CMake on multiple platforms
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -52,3 +52,28 @@ jobs:
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v6
+      with:
+        name: mongoping-linux-amd64
+        path: |
+          build/mongoping
+        if-no-files-found: ignore
+
+  release:
+    needs: build
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write   # required to create a release
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: dist
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/**/*
+          generate_release_notes: true
